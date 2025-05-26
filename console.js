@@ -1,54 +1,47 @@
 (function() {
     function getNextButton() {
-        return document.querySelector('button.next-page, .pagination-next, [data-testid="next-page"], span[data-testid="bonsai-icon-caret-right"]') || 
-               document.querySelector('a[aria-label="Next"], a[title="Next"]');
+        return document.querySelector('button[aria-label*="próxima"], button[title*="próxima"], a[aria-label*="próxima"], a[title*="próxima"], span[aria-label*="próxima"], .next, .next-page');
     }
 
     function getPrevButton() {
-        return document.querySelector('button.prev-page, .pagination-prev, [data-testid="prev-page"], span[data-testid="bonsai-icon-caret-left"]') || 
-               document.querySelector('a[aria-label="Previous"], a[title="Previous"]');
+        return document.querySelector('button[aria-label*="anterior"], button[title*="anterior"], a[aria-label*="anterior"], a[title*="anterior"], span[aria-label*="anterior"], .prev, .prev-page');
     }
 
-    function simulateMouseClick(element) {
-        if (!element) return false;
-
-        const rect = element.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-
-        const options = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y };
-        element.dispatchEvent(new MouseEvent('mouseover', options));
-        element.dispatchEvent(new MouseEvent('mousedown', options));
-        element.dispatchEvent(new MouseEvent('mouseup', options));
-        element.dispatchEvent(new MouseEvent('click', options));
-        return true;
+    function clickButton(button) {
+        if (button) {
+            button.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+            button.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            button.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+            button.click();
+            return true;
+        }
+        return false;
     }
 
     async function pageNavigationLoop() {
+        console.log("Script iniciado! Ele detectará cliques/movimento para evitar pausas.");
         while (true) {
             const pagesToMove = Math.floor(Math.random() * 5) + 1;
-            console.log(`Avançando ${pagesToMove} página(s)`);
-
+            console.log(`Indo ${pagesToMove} página(s) pra frente...`);
             for (let i = 0; i < pagesToMove; i++) {
                 const nextButton = getNextButton();
-                if (!simulateMouseClick(nextButton)) {
-                    console.log('Não foi possível encontrar o botão de próxima página');
+                if (!clickButton(nextButton)) {
+                    console.log("❌ Não encontrou o botão de próxima página!");
+                    console.log("[PAUSADO] Usuário inativo — esperando movimento/clique...");
                     return;
                 }
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
-
-            console.log(`Voltando ${pagesToMove} página(s)`);
-
+            console.log(`Voltando ${pagesToMove} página(s)...`);
             for (let i = 0; i < pagesToMove; i++) {
                 const prevButton = getPrevButton();
-                if (!simulateMouseClick(prevButton)) {
-                    console.log('Não foi possível encontrar o botão de página anterior');
+                if (!clickButton(prevButton)) {
+                    console.log("❌ Não encontrou o botão de página anterior!");
+                    console.log("[PAUSADO] Usuário inativo — esperando movimento/clique...");
                     return;
                 }
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
-
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
