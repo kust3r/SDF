@@ -217,7 +217,7 @@
             
             <div class="menu-header">
                 <div class="menu-title">🚀 Auto Reader</div>
-                <div class="menu-subtitle">Feito Por iUnknownBr</div>
+                <div class="menu-subtitle">K</div>
             </div>
             
             <div class="menu-content">
