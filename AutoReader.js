@@ -435,7 +435,7 @@
     document.addEventListener("mouseup", endDrag);
 
     console.log("🚀 Menu interativo carregado com sucesso!");
-    console.log("🚀 Feito Por iUnknownBr");
+    console.log("🚀 Feito Por ???");
     console.log("�📖 O menu está visível no canto superior direito da tela.");
     console.log("🎛️ Use os controles do menu para iniciar a passagem automática.");
     
