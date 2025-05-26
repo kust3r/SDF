@@ -1,50 +1,96 @@
-(function() {
-    function getNextButton() {
-        return document.querySelector('button[aria-label*="próxima"], button[title*="próxima"], a[aria-label*="próxima"], a[title*="próxima"], span[aria-label*="próxima"], .next, .next-page');
-    }
+(function () {
+  // botão de próxima página
+  function getNextButton() {
+    return document.querySelector('button.next-page, .pagination-next, [data-testid="next-page"], span[data-testid="bonsai-icon-caret-right"]') ||
+      document.querySelector('a[aria-label="Next"], a[title="Next"]');
+  }
 
-    function getPrevButton() {
-        return document.querySelector('button[aria-label*="anterior"], button[title*="anterior"], a[aria-label*="anterior"], a[title*="anterior"], span[aria-label*="anterior"], .prev, .prev-page');
-    }
+  // botão de página anterior
+  function getPrevButton() {
+    return document.querySelector('button.prev-page, .pagination-prev, [data-testid="prev-page"], span[data-testid="bonsai-icon-caret-left"]') ||
+      document.querySelector('a[aria-label="Previous"], a[title="Previous"]');
+  }
 
-    function clickButton(button) {
-        if (button) {
-            button.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
-            button.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-            button.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
-            button.click();
-            return true;
+  // simula clique de mouse realista
+  function simulateClick(el) {
+    if (!el) return false;
+
+    const eventOptions = {
+      bubbles: true,
+      cancelable: true,
+      view: window
+    };
+
+    ['mouseover', 'mousedown', 'mouseup', 'click'].forEach(type => {
+      const event = new MouseEvent(type, eventOptions);
+      el.dispatchEvent(event);
+    });
+
+    return true;
+  }
+
+  // elemento que será clicado em cada página (AJUSTE O SELETOR AQUI)
+  function getElementToClick() {
+    return document.querySelector('.elemento-a-ser-clicado, button.exemplo, .algum-outro-seletor');
+  }
+
+  // clica no botão, se existir
+  function clickButton(button) {
+    if (button) {
+      button.click();
+      return true;
+    }
+    return false;
+  }
+
+  // loop principal
+  async function pageNavigationLoop() {
+    while (true) {
+      const pagesToMove = Math.floor(Math.random() * 5) + 1;
+      console.log(`Avançando ${pagesToMove} página(s)`);
+
+      for (let i = 0; i < pagesToMove; i++) {
+        const nextButton = getNextButton();
+        if (!clickButton(nextButton)) {
+          console.log('Não foi possível encontrar o botão de próxima página');
+          return;
         }
-        return false;
-    }
 
-    async function pageNavigationLoop() {
-        console.log("Script iniciado! Ele detectará cliques/movimento para evitar pausas.");
-        while (true) {
-            const pagesToMove = Math.floor(Math.random() * 5) + 1;
-            console.log(`Indo ${pagesToMove} página(s) pra frente...`);
-            for (let i = 0; i < pagesToMove; i++) {
-                const nextButton = getNextButton();
-                if (!clickButton(nextButton)) {
-                    console.log("❌ Não encontrou o botão de próxima página!");
-                    console.log("[PAUSADO] Usuário inativo — esperando movimento/clique...");
-                    return;
-                }
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-            console.log(`Voltando ${pagesToMove} página(s)...`);
-            for (let i = 0; i < pagesToMove; i++) {
-                const prevButton = getPrevButton();
-                if (!clickButton(prevButton)) {
-                    console.log("❌ Não encontrou o botão de página anterior!");
-                    console.log("[PAUSADO] Usuário inativo — esperando movimento/clique...");
-                    return;
-                }
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(r => setTimeout(r, 1000));
+
+        const el = getElementToClick();
+        if (!simulateClick(el)) {
+          console.log('Não foi possível clicar no elemento alvo');
+        } else {
+          console.log('Clique simulado após avanço');
         }
-    }
 
-    pageNavigationLoop();
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      console.log(`Voltando ${pagesToMove} página(s)`);
+
+      for (let i = 0; i < pagesToMove; i++) {
+        const prevButton = getPrevButton();
+        if (!clickButton(prevButton)) {
+          console.log('Não foi possível encontrar o botão de página anterior');
+          return;
+        }
+
+        await new Promise(r => setTimeout(r, 1000));
+
+        const el = getElementToClick();
+        if (!simulateClick(el)) {
+          console.log('Não foi possível clicar no elemento alvo');
+        } else {
+          console.log('Clique simulado após retrocesso');
+        }
+
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+  }
+
+  // iniciar
+  pageNavigationLoop();
 })();
